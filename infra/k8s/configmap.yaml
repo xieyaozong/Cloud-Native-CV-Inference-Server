@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cv-inference-config
+data:
+  APP_ENV: "kubernetes"
+  MODEL_PATH: "models/model.onnx"
+  ONNX_PROVIDER: "CPUExecutionProvider"
+  MAX_IMAGE_SIZE: "1280"
+  LOG_LEVEL: "INFO"

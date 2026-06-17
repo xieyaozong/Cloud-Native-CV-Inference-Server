@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cv-inference
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cv-inference
+  template:
+    metadata:
+      labels:
+        app: cv-inference
+    spec:
+      containers:
+        - name: inference
+          image: cloud-native-cv-inference-server:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: cv-inference-config
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10

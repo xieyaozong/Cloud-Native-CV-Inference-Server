@@ -1,0 +1,14 @@
+{
+  "cluster": "cv-inference",
+  "serviceName": "cloud-native-cv-inference-server",
+  "taskDefinition": "cloud-native-cv-inference-server",
+  "desiredCount": 1,
+  "launchType": "FARGATE",
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": ["subnet-xxxxxxxx"],
+      "securityGroups": ["sg-xxxxxxxx"],
+      "assignPublicIp": "ENABLED"
+    }
+  }
+}

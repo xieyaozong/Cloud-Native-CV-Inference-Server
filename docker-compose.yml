@@ -1,0 +1,10 @@
+services:
+  inference:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.example
+    volumes:
+      - ./models:/app/models:ro
+      - ./sample_data:/app/sample_data:ro
