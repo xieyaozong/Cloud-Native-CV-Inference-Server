@@ -1,6 +1,8 @@
-# Cloud Native CV Inference Server
+# Cloud-Native-CV-Inference-Server
 
-FastAPI service skeleton for deploying computer-vision ONNX inference with Docker, AWS, and Kubernetes.
+FastAPI service for packaging a computer-vision ONNX model as a deployable inference API.
+
+The first milestone is a small service that can run locally or in Docker, accept image uploads, return prediction metadata, and expose basic runtime metrics. When no ONNX model is present, the API still validates the image path and returns a deterministic demo response, which keeps the deployment and API flow testable before model selection is final.
 
 ## Flow
 
@@ -38,6 +40,16 @@ http://127.0.0.1:8000/health
 http://127.0.0.1:8000/docs
 ```
 
+## Benchmark
+
+Start the API, then run:
+
+```powershell
+python scripts/benchmark_latency.py --runs 10
+```
+
+The default input is `sample_data/demo_images/dog_on_log_cc0.jpg`. Source and license details are recorded in `sample_data/ASSET_SOURCES.md`.
+
 ## Docker
 
 ```powershell
@@ -52,7 +64,7 @@ Place an ONNX model at `models/model.onnx`, or set:
 $env:MODEL_PATH = "models\your_model.onnx"
 ```
 
-If no model is present, `/predict` still validates upload, decodes the image, and returns demo metadata.
+If no model is present, `/predict` still validates the upload, decodes the image, and returns demo metadata. Invalid or unreadable model files are treated as not loaded so the health endpoint and local API flow stay available during setup.
 
 ## Layout
 

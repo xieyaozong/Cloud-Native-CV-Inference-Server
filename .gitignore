@@ -11,6 +11,7 @@ models/*.pt
 models/*.pth
 sample_data/demo_images/*
 !sample_data/demo_images/.gitkeep
+!sample_data/demo_images/dog_on_log_cc0.jpg
 outputs/
 .DS_Store
 Thumbs.db

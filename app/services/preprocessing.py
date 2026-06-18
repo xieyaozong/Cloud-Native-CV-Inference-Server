@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+from app.config import settings
 import cv2
 import numpy as np
-from app.config import settings
 
 
 def decode_image(data: bytes) -> np.ndarray:
+    if not data:
+        raise ValueError("Upload must not be empty.")
+
     array = np.frombuffer(data, dtype=np.uint8)
-    image = cv2.imdecode(array, cv2.IMREAD_COLOR)
+    try:
+        image = cv2.imdecode(array, cv2.IMREAD_COLOR)
+    except cv2.error as exc:
+        raise ValueError("Upload must be a readable image file.") from exc
+
     if image is None:
         raise ValueError("Upload must be a readable image file.")
     return image
