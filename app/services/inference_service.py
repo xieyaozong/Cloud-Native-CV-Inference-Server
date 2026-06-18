@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from threading import Lock
-import numpy as np
 from app.services.model_loader import get_session
 from app.services.postprocessing import summarize_outputs
 from app.services.preprocessing import to_nchw
-
+import numpy as np
 
 _lock = Lock()
 _requests = 0

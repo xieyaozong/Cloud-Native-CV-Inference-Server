@@ -1,30 +1,48 @@
 # Cloud-Native-CV-Inference-Server
 
-FastAPI service for packaging a computer-vision ONNX model as a deployable inference API.
+![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white&style=flat-square)
+![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white&style=flat-square)
+![ONNX Runtime](https://img.shields.io/badge/ONNX_Runtime-CPU-005CED?logo=onnx&logoColor=white&style=flat-square)
+![OpenCV](https://img.shields.io/badge/OpenCV-4.x-5C3EE8?logo=opencv&logoColor=white&style=flat-square)
+![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white&style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)
 
-The first milestone is a small service that can run locally or in Docker, accept image uploads, return prediction metadata, and expose basic runtime metrics. When no ONNX model is present, the API still validates the image path and returns a deterministic demo response, which keeps the deployment and API flow testable before model selection is final.
+Deployable computer-vision inference service built with FastAPI, ONNX Runtime, Docker, AWS notes, Kubernetes manifests, health checks, and latency benchmarking.
 
-## Flow
+![Inference API flow](assets/api_flow.png)
+
+## What It Does
+
+- Accepts image uploads through `/predict`.
+- Decodes images with OpenCV and prepares NCHW tensors for ONNX Runtime.
+- Runs a configured ONNX model when `models/model.onnx` is available.
+- Keeps the API usable before model setup by returning validated demo metadata.
+- Exposes `/health` and `/metrics` for deployment checks.
+- Includes Docker Compose, AWS ECS notes, Kubernetes manifests, and a benchmark script.
+
+## Demo Input
+
+The default benchmark image is a small CC0 image from Wikimedia Commons:
 
 ```text
-Client
-  -> FastAPI /predict
-  -> Preprocessing
-  -> ONNX Runtime Inference
-  -> Postprocessing
-  -> JSON Response + Metrics
+sample_data/demo_images/dog_on_log_cc0.jpg
 ```
 
-## MVP
+Source and license records are kept in `sample_data/ASSET_SOURCES.md`.
 
-- `/health`
-- `/predict`
-- `/metrics`
-- Docker and Docker Compose
-- Local sample-image inference path
-- Latency benchmark script
+## Pipeline
 
-## Run Locally
+```text
+Client image
+  -> FastAPI /predict
+  -> OpenCV decode
+  -> Tensor preprocessing
+  -> ONNX Runtime session
+  -> Output summary
+  -> JSON response + metrics
+```
+
+## Quick Start
 
 ```powershell
 python -m venv .venv
@@ -48,7 +66,21 @@ Start the API, then run:
 python scripts/benchmark_latency.py --runs 10
 ```
 
-The default input is `sample_data/demo_images/dog_on_log_cc0.jpg`. Source and license details are recorded in `sample_data/ASSET_SOURCES.md`.
+## Model Setup
+
+Place an ONNX model at:
+
+```text
+models/model.onnx
+```
+
+Or set:
+
+```powershell
+$env:MODEL_PATH = "models\your_model.onnx"
+```
+
+If the file is missing or unreadable, `/predict` still validates the uploaded image and returns a clear `model_loaded: false` response.
 
 ## Docker
 
@@ -56,30 +88,20 @@ The default input is `sample_data/demo_images/dog_on_log_cc0.jpg`. Source and li
 docker compose up --build
 ```
 
-## Model
-
-Place an ONNX model at `models/model.onnx`, or set:
-
-```powershell
-$env:MODEL_PATH = "models\your_model.onnx"
-```
-
-If no model is present, `/predict` still validates the upload, decodes the image, and returns demo metadata. Invalid or unreadable model files are treated as not loaded so the health endpoint and local API flow stay available during setup.
-
-## Layout
+## Repository Layout
 
 ```text
-cloud-native-cv-inference-server/
-  app/        FastAPI app, routes, services, utilities
-  models/     local ONNX model files
-  scripts/    model, benchmark, and deployment helpers
-  infra/      AWS and Kubernetes examples
-  docs/       architecture and deployment notes
-  tests/      API and preprocessing checks
+app/          FastAPI routes, settings, inference services, utilities
+models/       local ONNX model location
+sample_data/  demo image and asset source records
+scripts/      model, benchmark, and deployment helpers
+infra/        AWS and Kubernetes examples
+docs/         architecture and deployment notes
+tests/        API and preprocessing checks
 ```
 
-## Deploy Notes
+## Deployment Notes
 
-- Push Docker image to ECR: see `scripts/push_to_ecr.sh`.
-- Deploy to ECS: see `scripts/deploy_ecs.md` and `infra/aws/`.
-- Deploy to Kubernetes: see `infra/k8s/` and `docs/deployment_kubernetes.md`.
+- Push Docker image to ECR: `scripts/push_to_ecr.sh`
+- Deploy to ECS: `scripts/deploy_ecs.md` and `infra/aws/`
+- Deploy to Kubernetes: `infra/k8s/` and `docs/deployment_kubernetes.md`

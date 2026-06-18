@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-
-import pytest
 from scripts.benchmark_latency import p95, validate_image_path
-
+import pytest
 
 def test_p95() -> None:
     assert p95([1, 2, 3, 4, 5]) == 5
